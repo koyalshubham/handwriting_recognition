@@ -205,8 +205,6 @@ for scroll in images:
 		# initialize variables
 		line = 0
 		n_words = 0
-		old_y = 0
-		old_h = 0
 		average_y = 0
 		min_height = 20
 		min_width = 20
@@ -224,15 +222,17 @@ for scroll in images:
 				if h > min_height or w > min_width: # if image is not noise
 					
 					# determine line number line
-					if y + h/3 > old_y + 2*old_h/3 and (y + h/2 > average_y + 40 or y+h/2 < average_y - 40):
-						 # next line
-						line += 1
-						average_y = y + h/2
-						n_words = 0
-					else:
-						# same line
-						average_y = (n_words * average_y + y + h/2) / (n_words + 1)
-						n_words += 1
+					if h < 100:
+						# normal segment
+						if y + h/2 > average_y + 40 or y+h/2 < average_y - 40:
+							 # next line
+							line += 1
+							average_y = y + h/2
+							n_words = 0
+						else:
+							# same line
+							average_y = (n_words * average_y + y + h/2) / (n_words + 1)
+							n_words += 1
 					
 					# reset values
 					old_y = y
@@ -243,7 +243,7 @@ for scroll in images:
 					cv2.imwrite(segmented_areas_path + '/' + folder + '/row ' + str(line) + ' col ' + str(x) + '.jpg', roi)
 					
 					# draw a rectangle around the segmented area
-					if (h > 145):
+					if (h > 100):
 						cv2.rectangle(image_copy, (x, y), (x + w, y + h), (0, 255, 0), 2)
 					else:
 						cv2.rectangle(image_copy, (x, y), (x + w, y + h), (90, 0, 255), 2)
