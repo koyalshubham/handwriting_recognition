@@ -5,28 +5,32 @@ import math
 from skimage import filters
 from skimage import morphology
 
+from scipy import ndimage
+from skimage import img_as_ubyte
+from character_test import character_segmentation
+
+os.system('cls' if os.name == 'nt' else 'clear')
+
 imagefolder_path = 'images_bw'
 scroll_path = 'scrolls_only'
 holes_path = 'no_holes'
-binary_path = 'binarized'
+#binary_path = 'binarized'
 marked_areas_path = 'marked_areas'
 segmented_areas_path = 'segmented_areas'
-savefolder_path = 'contours_final'
 
 binary_otsu_path = 'binary_OTSU'
 erosion_path = 'erosion'
 closing_path = 'closing'
 open_rec_path = 'opening_by_reconstruction'
 erosion_after_rec_path = 'erosion_after_reconstruction'
-dilation_path = 'dilated_areas'
+#dilation_path = 'dilated_areas'
 
 segmented_areas_path_trash = 'segmented_areas_trash'  # used for debugging, remove in the end
 
 
-directories = [	scroll_path, holes_path, binary_path, marked_areas_path, segmented_areas_path,
+directories = [	scroll_path, holes_path, marked_areas_path, segmented_areas_path,
 				   binary_otsu_path, erosion_path, closing_path, open_rec_path, erosion_after_rec_path,
-				   dilation_path,
-				   segmented_areas_path_trash,savefolder_path]
+				   segmented_areas_path_trash]
 
 # make directories if they do not yet exist
 for path in directories:
@@ -253,49 +257,10 @@ for scroll in images:
 					cv2.putText(image_copy, str(line), cv2.boundingRect(currentContour)[:2], cv2.FONT_HERSHEY_COMPLEX, 1, [125])
 				else:
 					cv2.imwrite(segmented_areas_path_trash + '/' + folder + '/row ' + str(y) + ' col ' + str(x) + '.jpg', roi)
-
-                ###############Finding Characters##############
-				print("Finding characers")
-				shifted = cv2.pyrMeanShiftFiltering(image_copy, 90, 130)
-				# set appropriate format for treshold function
-				imgray = cv2.cvtColor(shifted, cv2.COLOR_BGR2GRAY)
-	
-				# reduce noise
-				factor = 5
-				kernel = np.ones((factor,factor), np.float32)/(factor*factor)
-				imgray = cv2.filter2D(imgray, -1, kernel)
-	
-				# binarize
-				( _, thresh) = cv2.threshold(imgray, 125, 255, cv2.THRESH_BINARY)
-	
-				# make white border
-				thresh = cv2.copyMakeBorder(thresh,1,1,1,1,cv2.BORDER_CONSTANT,value=255)
-	
-				# find contour
-				(contours, _) = cv2.findContours(thresh, cv2.RETR_TREE, cv2.CHAIN_APPROX_NONE)
-				# for a newer version of openCV, use the following:
-				# (_, contours, _) = cv2.findContours(thresh, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
-	
-				# sort contours on size area
-				sortedContours = sorted(contours, key=lambda x: cv2.contourArea(x), reverse = True)
-	
-				char_number = 'a'
-				for c in range(1, len(sortedContours)):
-					if cv2.contourArea(sortedContours[c]) > 30:
-						imcopy = im.copy()
-						print("In if")
-						# store character
-						mask = np.zeros(imcopy.shape[:2], dtype="uint8")
-						cv2.drawContours(mask, sortedContours, c, (255,255,255), cv2.FILLED)
-						imcopy = cv2.bitwise_or(imcopy, imcopy, mask=mask)
-						
-						bk = np.full(imcopy.shape, 255, dtype=np.uint8)  # white bk
-						mask = cv2.bitwise_not(mask)
-						bk_masked = cv2.bitwise_and(bk, bk, mask=mask)
-						imcopy = cv2.bitwise_or(imcopy, bk_masked)
-			
-						cv2.imwrite(savefolder_path + '/' + scroll + '_' + char_number + '.png', imcopy)
-						char_number = chr(ord(char_number) + 1)
 		
 		# save marked areas
 		cv2.imwrite(marked_areas_path + '/' + scroll, image_copy)
+
+result_folder = os.listdir(path)
+for folders in result_folder:
+	character_segmentation(folder)
