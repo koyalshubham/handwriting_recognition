@@ -309,10 +309,11 @@ for scroll in images:
 
                             #save characters
                             x2, y2, w2, h2 = cv2.boundingRect(sortedContours[c])
+                            character = roi[y2:y2 + h2, x2:x2 + w2]
                             x_char = x + x2
                             y_char = y + y2
                             cv2.imwrite(segmented_char_path + '/' + folder + '/line ' + str(line) + ' col ' + str(x_char) + '.jpg',
-                            imcopy)
+                            character)
 
                             #draw rectangle around characters
                             cv2.rectangle(image_copy2, (x_char, y_char), (x_char + w2, y_char + h2), (0, 255, 0), 2)
