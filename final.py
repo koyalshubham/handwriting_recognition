@@ -11,7 +11,8 @@ holes_path = 'no_holes'
 binary_path = 'binarized'
 marked_areas_path = 'marked_areas'
 segmented_areas_path = 'segmented_areas'
-savefolder_path = 'contours_final'
+segmented_char_path = 'segmented_characters'
+marked_char_path = 'marked_characters'
 
 binary_otsu_path = 'binary_OTSU'
 erosion_path = 'erosion'
@@ -25,7 +26,7 @@ segmented_areas_path_trash = 'segmented_areas_trash'  # used for debugging, remo
 directories = [scroll_path, holes_path, binary_path, marked_areas_path, segmented_areas_path,
                binary_otsu_path, erosion_path, closing_path, open_rec_path, erosion_after_rec_path,
                dilation_path,
-               segmented_areas_path_trash, savefolder_path]
+               segmented_areas_path_trash, segmented_char_path, marked_char_path]
 
 # make directories if they do not yet exist
 for path in directories:
@@ -196,9 +197,14 @@ for scroll in images:
             os.mkdir(segmented_areas_path_trash + '/' + folder)
             print("Directory ", segmented_areas_path_trash + '/' + folder, " created ")
 
+        if not os.path.exists(segmented_char_path + '/' + folder):
+            os.mkdir(segmented_char_path + '/' + folder)
+            print("Directory ", segmented_char_path + '/' + folder, " created ")
+
         # copy read image
         image = np.copy(im)
         image_copy = np.copy(im)
+        image_copy2 = np.copy(im)
 
         # get the actual inner list of hierarchy descriptions
         hierarchy = hierarchy[0]
@@ -220,7 +226,13 @@ for scroll in images:
 
                 # Getting ROI
                 roi = image[y:y + h, x:x + w]
-                if h > min_height or w > min_width:  # if image is not noise
+
+                if h <= min_height and w <= min_width:  # if image is noise
+                    cv2.imwrite(
+                        segmented_areas_path_trash + '/' + folder + '/line ' + str(line) + ' col ' + str(x) + '.jpg',
+                        roi)
+
+                else:  # if image is not noise
 
                     # determine line number line
                     if h < 100:
@@ -241,7 +253,7 @@ for scroll in images:
                     old_x = x
 
                     # Save segments
-                    cv2.imwrite(segmented_areas_path + '/' + folder + '/row ' + str(line) + ' col ' + str(x) + '.jpg',
+                    cv2.imwrite(segmented_areas_path + '/' + folder + '/line ' + str(line) + ' col ' + str(x) + '.jpg',
                                 roi)
 
                     # draw a rectangle around the segmented area
@@ -253,52 +265,61 @@ for scroll in images:
                     # draw number of contour
                     cv2.putText(image_copy, str(line), cv2.boundingRect(currentContour)[:2], cv2.FONT_HERSHEY_COMPLEX,
                                 1, [125])
-                else:
-                    cv2.imwrite(
-                        segmented_areas_path_trash + '/' + folder + '/row ' + str(y) + ' col ' + str(x) + '.jpg', roi)
 
-                ###############Finding Characters##############
-                print("Finding characers")
-                shifted = cv2.pyrMeanShiftFiltering(roi.copy(), 90, 130)
-                # set appropriate format for threshold function
-                imgray = cv2.cvtColor(shifted, cv2.COLOR_BGR2GRAY)
+                    ###############Finding Characters##############
+                    #print("Finding characers")
+                    shifted = cv2.pyrMeanShiftFiltering(roi.copy(), 90, 130)
+                    # set appropriate format for threshold function
+                    imgray = cv2.cvtColor(shifted, cv2.COLOR_BGR2GRAY)
 
-                # reduce noise
-                factor = 5
-                kernel = np.ones((factor, factor), np.float32) / (factor * factor)
-                imgray = cv2.filter2D(imgray, -1, kernel)
+                    # reduce noise
+                    factor = 5
+                    kernel = np.ones((factor, factor), np.float32) / (factor * factor)
+                    imgray = cv2.filter2D(imgray, -1, kernel)
 
-                # binarize
-                (_, thresh) = cv2.threshold(imgray, 125, 255, cv2.THRESH_BINARY)
+                    # binarize
+                    (_, thresh) = cv2.threshold(imgray, 125, 255, cv2.THRESH_BINARY)
 
-                # make white border
-                thresh = cv2.copyMakeBorder(thresh, 1, 1, 1, 1, cv2.BORDER_CONSTANT, value=255)
+                    # make white border
+                    thresh = cv2.copyMakeBorder(thresh, 1, 1, 1, 1, cv2.BORDER_CONSTANT, value=255)
 
-                # find contour
-                (contours, _) = cv2.findContours(thresh, cv2.RETR_TREE, cv2.CHAIN_APPROX_NONE)
-                # for a newer version of openCV, use the following:
-                # (_, contours, _) = cv2.findContours(thresh, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
+                    # find contour
+                    (contours, _) = cv2.findContours(thresh, cv2.RETR_TREE, cv2.CHAIN_APPROX_NONE)
+                    # for a newer version of openCV, use the following:
+                    # (_, contours, _) = cv2.findContours(thresh, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
 
-                # sort contours on size area
-                sortedContours = sorted(contours, key=lambda x: cv2.contourArea(x), reverse=True)
+                    # sort contours on size area
+                    sortedContours = sorted(contours, key=lambda x: cv2.contourArea(x), reverse=True)
 
-                char_number = 'a'
-                for c in range(1, len(sortedContours)):
-                    if cv2.contourArea(sortedContours[c]) > 30:
-                        imcopy = im.copy()
-                        print("In if")
-                        # store character
-                        mask = np.zeros(imcopy.shape[:2], dtype="uint8")
-                        cv2.drawContours(mask, sortedContours, c, (255, 255, 255), cv2.FILLED)
-                        imcopy = cv2.bitwise_or(imcopy, imcopy, mask=mask)
+                    char_number = 'a'
+                    for c in range(1, len(sortedContours)):
+                        if cv2.contourArea(sortedContours[c]) > 30:
+                            imcopy = roi.copy()
 
-                        bk = np.full(imcopy.shape, 255, dtype=np.uint8)  # white bk
-                        mask = cv2.bitwise_not(mask)
-                        bk_masked = cv2.bitwise_and(bk, bk, mask=mask)
-                        imcopy = cv2.bitwise_or(imcopy, bk_masked)
+                            #print("In if")
+                            # store character
+                            mask = np.zeros(imcopy.shape[:2], dtype="uint8")
+                            cv2.drawContours(mask, sortedContours, c, (255, 255, 255), cv2.FILLED)
+                            imcopy = cv2.bitwise_or(imcopy, imcopy, mask=mask)
 
-                        cv2.imwrite(savefolder_path + '/' + scroll + '_' + char_number + '.png', imcopy)
-                        char_number = chr(ord(char_number) + 1)
+                            bk = np.full(imcopy.shape, 255, dtype=np.uint8)  # white bk
+                            mask = cv2.bitwise_not(mask)
+                            bk_masked = cv2.bitwise_and(bk, bk, mask=mask)
+                            imcopy = cv2.bitwise_or(imcopy, bk_masked)
+
+                            #save characters
+                            x2, y2, w2, h2 = cv2.boundingRect(sortedContours[c])
+                            x_char = x + x2
+                            y_char = y + y2
+                            cv2.imwrite(segmented_char_path + '/' + folder + '/line ' + str(line) + ' col ' + str(x_char) + '.jpg',
+                            imcopy)
+
+                            #draw rectangle around characters
+                            cv2.rectangle(image_copy2, (x_char, y_char), (x_char + w2, y_char + h2), (0, 255, 0), 2)
+
 
         # save marked areas
         cv2.imwrite(marked_areas_path + '/' + scroll, image_copy)
+
+        # save marked characters
+        cv2.imwrite(marked_char_path + '/' + scroll, image_copy2)
