@@ -19,10 +19,10 @@ def get_contour_rank(contour, cols):
 def convert_scroll_to_imgs():
     print("Converting scrolls to imgs")
     imagefolder_path = 'images'
-    marked_areas_path = 'marked_areas'
+    marked_words_path = 'marked_words'
     segmented_char_path = 'segmented_characters'
 
-    directories = [marked_areas_path, segmented_char_path]
+    directories = [marked_words_path, segmented_char_path]
 
     # make directories if they do not yet exist
     for path in directories:
@@ -204,17 +204,11 @@ def convert_scroll_to_imgs():
                                 # same line
                                 average_y = (n_words * average_y + y + h / 2) / (n_words + 1)
                                 n_words += 1
-                                
-                            # draw a pink box around the word
-                            cv2.rectangle(image_copy, (x, y), (x + w, y + h), (90, 0, 255), 2)
-                        else:               # big segment, ignore by line numbering
-                            # draw a green box around the word
-                            cv2.rectangle(image_copy, (x, y), (x + w, y + h), (0, 255, 0), 2)
 
-                        # draw line-number next to box
+                        # draw pink bounding box with line-number 
+                        cv2.rectangle(image_copy, (x, y), (x + w, y + h), (90, 0, 255), 2)
                         cv2.putText(image_copy, str(line), cv2.boundingRect(currentContour)[:2],
-                                    cv2.FONT_HERSHEY_COMPLEX,
-                                    1, [125])
+                                    cv2.FONT_HERSHEY_COMPLEX, 1, [125])
 
                         ############### Finding Characters ##############
 
@@ -278,7 +272,7 @@ def convert_scroll_to_imgs():
                                     cv2.rectangle(image_copy2, (x_char, y_char), (x_char + w2, y_char + h2), (0, 255, 0), 2)
 
             # save marked areas
-            cv2.imwrite(marked_areas_path + '/' + scroll, image_copy)
+            cv2.imwrite(marked_words_path + '/' + scroll, image_copy)
     print("Completed scroll to img")
 
 
