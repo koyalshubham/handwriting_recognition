@@ -19,6 +19,7 @@ def get_contour_rank(contour, cols):
 def convert_scroll_to_imgs():
     print("Converting scrolls to imgs")
     imagefolder_path = 'images'
+
     marked_words_path = 'marked_words'
     segmented_char_path = 'segmented_characters'
 
@@ -38,6 +39,7 @@ def convert_scroll_to_imgs():
             image_path = imagefolder_path + '/' + scroll
             im = cv2.imread(image_path)
             print("Finding characters in image: %s" % image_path)
+
 
             # set appropriate format for threshold function
             imgray = cv2.cvtColor(im, cv2.COLOR_BGR2GRAY)
@@ -107,6 +109,7 @@ def convert_scroll_to_imgs():
             bk = np.full(im.shape, 255, dtype=np.uint8)  # white bk
             mask = cv2.bitwise_not(mask)
             bk_masked = cv2.bitwise_and(bk, bk, mask=mask)
+            
             no_holes = cv2.bitwise_or(im, bk_masked)
 
             ##################### binarize image #####################
@@ -129,7 +132,6 @@ def convert_scroll_to_imgs():
             # (erosion then dilation)
             kernel = np.ones((5, 5), np.uint8)
             img_erosion = cv2.erode(binary, kernel, iterations=1)
-
             marker = img_erosion.copy()
             mask = binary.copy()
             img_open_rec = morphology.reconstruction(marker, mask, method='dilation')
@@ -161,7 +163,7 @@ def convert_scroll_to_imgs():
 
             # get scroll name without extension
             folder = scroll[:-4]
-            
+
             # make directory
             if not os.path.exists(segmented_char_path + '/' + folder):
                 os.mkdir(segmented_char_path + '/' + folder)
@@ -191,7 +193,6 @@ def convert_scroll_to_imgs():
 
                     # Getting ROI
                     roi = image[y:y + h, x:x + w]
-
                     if h > min_height or w > min_width:  # if image is not noise
                         # determine line number line
                         if h < 100:        # normal segment
@@ -205,13 +206,13 @@ def convert_scroll_to_imgs():
                                 average_y = (n_words * average_y + y + h / 2) / (n_words + 1)
                                 n_words += 1
 
+
                         # draw pink bounding box with line-number 
                         cv2.rectangle(image_copy, (x, y), (x + w, y + h), (90, 0, 255), 2)
                         cv2.putText(image_copy, str(line), cv2.boundingRect(currentContour)[:2],
                                     cv2.FONT_HERSHEY_COMPLEX, 1, [125])
 
                         ############### Finding Characters ##############
-
                         shifted = cv2.pyrMeanShiftFiltering(roi.copy(), 90, 130)
                         # set appropriate format for threshold function
                         imgray = cv2.cvtColor(shifted, cv2.COLOR_BGR2GRAY)
@@ -229,7 +230,7 @@ def convert_scroll_to_imgs():
 
                         # find contour
                         (contours, _) = cv2.findContours(thresh, cv2.RETR_TREE, cv2.CHAIN_APPROX_NONE)
-                        
+
                         # sort contours on size area
                         sortedContours = sorted(contours, key=lambda x: cv2.contourArea(x), reverse=True)
 
@@ -258,7 +259,7 @@ def convert_scroll_to_imgs():
                                 mean_max = 189
                                 stdev_min = 22
                                 stdev_max = 115
-                                
+         
                                 # remove noise images
                                 if mean >= mean_min and mean <= mean_max and stdev >= stdev_min and stdev <= stdev_max:
                                     # save characters
@@ -271,8 +272,9 @@ def convert_scroll_to_imgs():
                                     # draw rectangle around characters
                                     cv2.rectangle(image_copy2, (x_char, y_char), (x_char + w2, y_char + h2), (0, 255, 0), 2)
 
-            # save marked areas
+            # save marked words
             cv2.imwrite(marked_words_path + '/' + scroll, image_copy)
+
     print("Completed scroll to img")
 
 
@@ -344,4 +346,6 @@ def convert_img_to_csv():
 convert_scroll_to_imgs()
 # convert imgs to csv
 convert_img_to_csv()
+
 # run model
+
