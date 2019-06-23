@@ -1,5 +1,7 @@
 # packages to download:
 openCV
+os
+math
 numpy
 scikit-image
 tqdm
