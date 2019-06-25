@@ -5,9 +5,10 @@ math
 numpy
 scikit-image
 tqdm
+keras
 
 # input
-As input this program has a folder named 'images' containing of the fused dead-sea scrolls
+As input this program has a folder named 'images' containing of the fused dead-sea scrolls. To run this recogniser keep the black & white scrolls and the training data in the same root directory as the .py file.
 
 # goal
 This program uses image processing to find the characters in the scroll. After that machine learning is used to name the characters.
