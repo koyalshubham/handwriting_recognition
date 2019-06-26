@@ -1,4 +1,9 @@
 # packages to download:
+
+Please run the requirements.sh file with sudo command to install all the required packages.
+
+# packages used
+
 openCV
 os
 math
@@ -7,8 +12,7 @@ scikit-image
 tqdm
 keras
 sys
-
-Please run sudo apt-get install libhdf5-serial-dev to install h5py to load the model used
+h5py
 
 # input
 As input this program takes the path containing the fused dead-sea scrolls given by the user as an argument using command. Example: python my_classifier.py mypath/testset/.
