@@ -463,92 +463,30 @@ def create_training_data():
     return training_data
 
 
-# def run_model():
-#     with open('X.csv', 'r') as infile:
-#         reader = csv.reader(infile)
-#         lines = list(reader)
+def run_model(filename="input.csv"):
+    
+    model = load_model('hwr50px.h5')
 
-#     X = []
-#     for row in lines:
-#         new_row = [float(i) for i in row]
-#         X.append(new_row)
+    predictions= model.predict(filename)
+    
+    #generate top5 predictions
+    values = ["Alef", "Ayin", "Bet", "Dalet", "Gimel", "He", "Het", "Kaf", "Kaf-final", "Lamed", "Mem","Mem-medial", "Nun-final", "Nun-medial", "Pe", "Pe-final", "Qof", "Resh", "Samekh", "Shin", "Taw","Tet", "Tsadi-final", "Tsadi-medial", "Waw", "Yod", "Zayin"]
+    keys = range(len(values))
+    alphabets = dict(zip(keys, values))
+    sorting = (-predictions).argsort()
+    top5 = sorting[:,:5]
+    
+    #top5_predictions is a list of lists containing the top5 predictions per character
+    # TODO append char_id to each list of top5 predictions
+    top5_predictions = []
+    for i in range(top5.shape[0]):
+        new_char = []
+        for j in range(top5.shape[1]):
+            label_class = top5[i,j]
+            alphabet = alphabets[label_class]
+            new_char.append(alphabet)
+        top5_predictions.append(new_char)
 
-#     X = np.asarray(X)
-
-#     with open('y.csv', 'r') as infile:
-#         reader = csv.reader(infile)
-#         lines = list(reader)
-
-#     y = []
-#     for row in lines:
-#         new_row = [float(i) for i in row]
-#         y.append(new_row)
-
-#     y = np.asarray(y)
-
-#     X_train = X.reshape(X.shape[0], 100, 100, 1)
-#     X_train = X_train.astype('float32')
-#     X_train /= 255
-
-#     number_of_classes = 27
-
-#     Y_train = np_utils.to_categorical(y, number_of_classes)
-
-#     # Miniaturized VGG-16 model
-
-#     model = Sequential()
-
-#     model.add(Conv2D(64, (3, 3), input_shape=(100, 100, 1), activation='relu', padding='same'))
-#     # model.add(Conv2D(64, (3, 3), activation='relu'))
-#     model.add(MaxPooling2D(pool_size=(2, 2), strides=(1, 1)))
-
-#     model.add(Conv2D(128, (3, 3), activation='relu', padding='same'))
-#     # model.add(Conv2D(128, (3, 3), activation='relu'))
-#     model.add(MaxPooling2D(pool_size=(2, 2), strides=(1, 1)))
-
-#     model.add(Conv2D(256, (3, 3), activation='relu', padding='same'))
-#     # model.add(Conv2D(256, (3, 3), activation='relu', padding='same'))
-#     model.add(Conv2D(256, (3, 3), activation='relu'))
-#     model.add(MaxPooling2D(pool_size=(2, 2), strides=(1, 1)))
-
-#     model.add(Conv2D(512, (3, 3), activation='relu', padding='same'))
-#     # model.add(Conv2D(512, (3, 3), activation='relu', padding='same'))
-#     model.add(Conv2D(512, (3, 3), activation='relu'))
-#     model.add(MaxPooling2D(pool_size=(2, 2), strides=(1, 1)))
-
-#     model.add(Conv2D(512, (3, 3), activation='relu', padding='same'))
-#     # model.add(Conv2D(512, (3, 3), activation='relu', padding='same'))
-#     model.add(Conv2D(512, (3, 3), activation='relu'))
-#     model.add(MaxPooling2D(pool_size=(2, 2), strides=(1, 1)))
-
-#     model.add(Flatten())
-
-#     model.add(Dense(512, activation='relu', kernel_regularizer=l2(0.0005), bias_regularizer=l2(0.0005)))
-#     model.add(Dropout(0.5))
-#     model.add(Dense(512, activation='relu', kernel_regularizer=l2(0.0005), bias_regularizer=l2(0.0005)))
-#     model.add(Dropout(0.5))
-#     model.add(Dense(27, activation='softmax'))
-
-#     model.compile(loss='categorical_crossentropy', optimizer=SGD(lr=0.01, momentum=0.9), metrics=['accuracy'])
-
-#     model.summary()
-
-#     model.fit(X_train, Y_train, batch_size=128, epochs=50, verbose=1)
-
-#     with open('test.csv', 'r') as infile:
-#         reader = csv.reader(infile)
-#         lines = list(reader)
-
-#     X_test = []
-#     for row in lines:
-#         new_row = [float(i) for i in row]
-#         X_test.append(new_row)
-
-#     X_test = np.asarray(X_test)
-
-#     predictions = model.predict(X_test)
-
-#     np.savetxt('predictions.txt', predictions, delimiter=',')
 
 
 # convert scroll img to character imgs
