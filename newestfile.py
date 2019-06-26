@@ -467,10 +467,12 @@ def create_training_data():
 
 def run_model(filename="input.csv"):
     
+    # filename should be the csv that Kayleigh outputs for a scroll image
+    
     model = load_model('hwr50px.h5')
     
     # preprocess input into train and char_id nparrays
-    with open('X50px.csv', 'r') as infile:
+    with open(filename, 'r') as infile:
         reader = csv.reader(infile)
         lines = list(reader)
     input_data = []
@@ -482,7 +484,7 @@ def run_model(filename="input.csv"):
     char_id = input_data[:, :2]
     train = input_data[:, 2:]
 
-    predictions= model.predict(filename)
+    predictions= model.predict(train)
     
     #generate top5 predictions
     values = ["Alef", "Ayin", "Bet", "Dalet", "Gimel", "He", "Het", "Kaf", "Kaf-final", "Lamed", "Mem","Mem-medial", "Nun-final", "Nun-medial", "Pe", "Pe-final", "Qof", "Resh", "Samekh", "Shin", "Taw","Tet", "Tsadi-final", "Tsadi-medial", "Waw", "Yod", "Zayin"]
@@ -506,11 +508,11 @@ def run_model(filename="input.csv"):
     predictions_with_id = np.concatenate((char_id, top5_predictions), axis=1)
 
 
-
 # convert scroll img to character imgs
 convert_scroll_to_imgs()
 # convert imgs to csv
 convert_img_to_csv()
 make_training_csv()
+# TODO run_model() function should loop over all the 20 csv files
 # run model
 #run_model()
