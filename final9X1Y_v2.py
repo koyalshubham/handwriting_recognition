@@ -7,8 +7,9 @@ from skimage import morphology
 from tqdm import tqdm
 import numpy as np
 import pandas as pd
+import sys
 
-#import matplotlib.pyplot as plt
+# import matplotlib.pyplot as plt
 # %matplotlib inline
 # from keras.models import Sequential
 # from keras.layers import Dense, Dropout, Activation, Flatten
@@ -31,9 +32,9 @@ def get_contour_rank(contour, cols):
     return ((y // tolerance_factor) * tolerance_factor) * cols + x
 
 
-def convert_scroll_to_imgs():
+def convert_scroll_to_imgs(imagefolder_path):
     print("Converting scrolls to imgs")
-    imagefolder_path = 'images'
+    #imagefolder_path = 'images'
 
     marked_words_path = 'marked_words'
     segmented_char_path = 'segmented_characters'
@@ -238,7 +239,7 @@ def convert_scroll_to_imgs():
                         # binarize
                         (_, thresh) = cv2.threshold(imgray, 125, 255, cv2.THRESH_BINARY)
 
-                        # make white border  
+                        # make white border
                         thresh = cv2.copyMakeBorder(thresh, 1, 1, 1, 1, cv2.BORDER_CONSTANT, value=255)
 
                         # find contour
@@ -301,10 +302,10 @@ def convert_img_to_csv():
     segmented_folder_info = []
 
     for subdir, dirs, files in os.walk(parent_folder_name):
-    
+
         for folder in dirs:
             filepath = "{}/{}".format(parent_folder_name, folder)
-            
+
             line_list = []
             line_no_list = []
             col_list = []
@@ -318,13 +319,13 @@ def convert_img_to_csv():
                 col_list.append(data[2])
                 col_no_list.append(int(data[3][:-4]))
                 filename_list.append(image_filepath)
-                
+
             data = {
-                'line':line_list,
-                'line_no':line_no_list,
-                'col':col_list,
-                'col_no':col_no_list,
-                'filename':filename_list
+                'line': line_list,
+                'line_no': line_no_list,
+                'col': col_list,
+                'col_no': col_no_list,
+                'filename': filename_list
             }
             df = pd.DataFrame(data)
             df = df.sort_values(['line_no', 'col_no'], ascending=[True, True])
@@ -347,14 +348,14 @@ def convert_img_to_csv():
                 img_array = cv2.imread(img_filename, cv2.IMREAD_GRAYSCALE)  # convert to array
                 new_array = cv2.resize(img_array, (IMG_SIZE, IMG_SIZE))  # resize to normalize data size
 
-                training_data.append([new_array,category])
+                training_data.append([new_array, category])
             except Exception as e:  # in the interest in keeping the output clean...
                 pass
             except OSError as e:
                 print("OSErrroBad img most likely", e, os.path.join(path, img))
             except Exception as e:
                 print("general exception", e, os.path.join(path, img))
-            
+
             X = []
             y = []
 
@@ -374,6 +375,7 @@ def convert_img_to_csv():
 
         np.savetxt("{}.csv".format(scroll_folder_name), scroll_array, delimiter=",")
         print("Completed img to csv")
+
 
 def make_training_csv():
     DATADIR = "training-data"
@@ -548,11 +550,23 @@ def create_training_data():
 
 #     np.savetxt('predictions.txt', predictions, delimiter=',')
 
+def take_input_argument():
+    # print the given arguments
+    print("The arguments are: ", str(sys.argv))
+    if len(sys.argv) == 1:
+        imagefolder_path = 'images'
+        print("use default folder: " + imagefolder_path)
+    else:
+        imagefolder_path = sys.argv[1]
+        print("given folder: " + imagefolder_path)
+    return imagefolder_path
 
+# take input argument (file path) from command
+imagefolder_path = take_input_argument()
 # convert scroll img to character imgs
-convert_scroll_to_imgs()
+convert_scroll_to_imgs(imagefolder_path)
 # convert imgs to csv
 convert_img_to_csv()
-make_training_csv()
+#make_training_csv()
 # run model
-#run_model()
+# run_model()
