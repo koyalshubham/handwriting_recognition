@@ -443,78 +443,8 @@ def create_training_data():
 
 
 def run_model():
-
-    with open('X.csv', 'r') as infile:
-        reader = csv.reader(infile)
-        lines = list(reader)
-
-    X = []
-    for row in lines:
-        new_row = [float(i) for i in row]
-        X.append(new_row)
-        
-    X = np.asarray(X)
-
-    with open('y.csv', 'r') as infile:
-        reader = csv.reader(infile)
-        lines = list(reader)
-        
-    y = []
-    for row in lines:
-        new_row = [float(i) for i in row]
-        y.append(new_row)
-        
-    y = np.asarray(y)
-
-    X_train = X.reshape(X.shape[0], 100, 100, 1)
-    X_train = X_train.astype('float32')
-    X_train/=255
-
-    number_of_classes = 27
-
-    Y_train = np_utils.to_categorical(y, number_of_classes)
-
-
-    # Miniaturized VGG-16 model
-
-    model = Sequential()
-
-    model.add(Conv2D(64, (3, 3), input_shape=(100,100,1), activation='relu', padding='same'))
-    #model.add(Conv2D(64, (3, 3), activation='relu'))
-    model.add(MaxPooling2D(pool_size=(2,2), strides=(1, 1)))
-
-    model.add(Conv2D(128, (3, 3), activation='relu', padding='same'))
-    #model.add(Conv2D(128, (3, 3), activation='relu'))
-    model.add(MaxPooling2D(pool_size=(2,2), strides=(1, 1)))
-
-    model.add(Conv2D(256, (3, 3), activation='relu', padding='same'))
-    #model.add(Conv2D(256, (3, 3), activation='relu', padding='same'))
-    model.add(Conv2D(256, (3, 3), activation='relu'))
-    model.add(MaxPooling2D(pool_size=(2,2), strides=(1, 1)))
-
-    model.add(Conv2D(512, (3, 3), activation='relu', padding='same'))
-    #model.add(Conv2D(512, (3, 3), activation='relu', padding='same'))
-    model.add(Conv2D(512, (3, 3), activation='relu'))
-    model.add(MaxPooling2D(pool_size=(2,2), strides=(1, 1)))
-
-    model.add(Conv2D(512, (3, 3), activation='relu', padding='same'))
-    #model.add(Conv2D(512, (3, 3), activation='relu', padding='same'))
-    model.add(Conv2D(512, (3, 3), activation='relu'))
-    model.add(MaxPooling2D(pool_size=(2,2), strides=(1, 1)))
-
-    model.add(Flatten())
-
-    model.add(Dense(512, activation='relu', kernel_regularizer=l2(0.0005), bias_regularizer=l2(0.0005)))
-    model.add(Dropout(0.5))
-    model.add(Dense(512, activation='relu', kernel_regularizer=l2(0.0005), bias_regularizer=l2(0.0005)))
-    model.add(Dropout(0.5))
-    model.add(Dense(27, activation='softmax'))
-
-    model.compile(loss='categorical_crossentropy', optimizer=SGD(lr=0.01,momentum=0.9), metrics=['accuracy'])
-
-    model.summary()
-
-    model.fit(X_train, Y_train, batch_size=128, epochs=50, verbose=1)
+    
+    model = load_model('hwr50px.h5')
 
     with open('train.csv', 'r') as infile:
         reader = csv.reader(infile)
