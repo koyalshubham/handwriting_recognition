@@ -468,6 +468,19 @@ def create_training_data():
 def run_model(filename="input.csv"):
     
     model = load_model('hwr50px.h5')
+    
+    # preprocess input into train and char_id nparrays
+    with open('X50px.csv', 'r') as infile:
+        reader = csv.reader(infile)
+        lines = list(reader)
+    input_data = []
+    for row in lines:
+        new_row = [float(i) for i in row]
+        input_data.append(new_row)
+    input_data = np.asarray(input_data)
+    
+    char_id = input_data[:, :2]
+    train = input_data[:, 2:]
 
     predictions= model.predict(filename)
     
@@ -488,6 +501,9 @@ def run_model(filename="input.csv"):
             alphabet = alphabets[label_class]
             new_char.append(alphabet)
         top5_predictions.append(new_char)
+        
+    top5_predictions = np.asarray(top5_predictions)
+    predictions_with_id = np.concatenate((char_id, top5_predictions), axis=1)
 
 
 
