@@ -21,7 +21,7 @@ def get_contour_rank(contour, cols):
     # // is floor division
     return ((y // tolerance_factor) * tolerance_factor) * cols + x
 
-
+# used to segment characters from the test images
 def convert_scroll_to_imgs(imagefolder_path):
     print("Converting scrolls to imgs")
 
@@ -282,7 +282,7 @@ def convert_scroll_to_imgs(imagefolder_path):
 
     print("Completed scroll to img")
 
-
+# used to convert segmented characters into csv with pixel values per line and column
 def convert_img_to_csv():
     ###---- START -> to extract the line and col nos from the filenames
     parent_folder_name = "segmented_characters"
@@ -354,7 +354,7 @@ def convert_img_to_csv():
 
     print("Completed img to csv")
 
-
+# used to predict the label of the segmented characters and generate a csv file with the prediction
 def run_model():
     seg_chars = os.listdir('segmented_characters')
     for filename in seg_chars:
@@ -414,6 +414,7 @@ def run_model():
     # one file with top5 predictions
 
 
+# used to set the path to the test images
 def take_input_argument():
     # print the given arguments
     print("The arguments are: ", str(sys.argv))
