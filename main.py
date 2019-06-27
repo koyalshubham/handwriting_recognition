@@ -8,6 +8,7 @@ from tqdm import tqdm
 import numpy as np
 import pandas as pd
 import csv
+import sys
 from keras.models import load_model
 from keras.models import Model
 
@@ -21,9 +22,8 @@ def get_contour_rank(contour, cols):
     return ((y // tolerance_factor) * tolerance_factor) * cols + x
 
 
-def convert_scroll_to_imgs():
+def convert_scroll_to_imgs(imagefolder_path):
     print("Converting scrolls to imgs")
-    imagefolder_path = 'images'
 
     marked_words_path = 'marked_words'
     segmented_char_path = 'segmented_characters'
@@ -292,7 +292,7 @@ def convert_img_to_csv():
         # convert information
         for folder in dirs:
             filepath = "{}/{}".format(parent_folder_name, folder)
-            
+
             line_no_list = []
             col_no_list = []
             filename_list = []
@@ -302,11 +302,11 @@ def convert_img_to_csv():
                 line_no_list.append(int(data[1]))
                 col_no_list.append(int(data[3][:-4]))
                 filename_list.append(image_filepath)
-                
+
             data = {
-                'line_no':line_no_list,
-                'col_no':col_no_list,
-                'filename':filename_list
+                'line_no': line_no_list,
+                'col_no': col_no_list,
+                'filename': filename_list
             }
             df = pd.DataFrame(data)
             df = df.sort_values(['line_no', 'col_no'], ascending=[True, True])
@@ -351,9 +351,8 @@ def convert_img_to_csv():
 
             for i in scroll_array:
                 writer.writerow(i)
-        
-    print("Completed img to csv")
 
+    print("Completed img to csv")
 
 
 def run_model():
@@ -361,7 +360,7 @@ def run_model():
     for filename in seg_chars:
         if filename[-3:] == 'csv':
             model = load_model('hwr50px.h5')
-            
+
             # preprocess input into train and char_id nparrays
             with open(filename, 'r') as infile:
                 reader = csv.reader(infile)
@@ -371,52 +370,65 @@ def run_model():
                 new_row = [float(i) for i in row]
                 input_data.append(new_row)
             input_data = np.asarray(input_data)
-            
+
             char_id = input_data[:, :2]
             train = input_data[:, 2:]
 
-            predictions= model.predict(train)
-            
-            #generate top5 predictions
-            values = ["alef", "ayin", "bet", "dalet", "gimel", "he", "het", "kaf", "kaf-final", "lamed", "mem","mem-medial", "nun-final", "nun-medial", "pe", "pe-final", "qof", "resh", "samekh", "shin", "taw","tet", "tsadi-final", "tsadi-medial", "waw", "yod", "zayin"]
+            predictions = model.predict(train)
+
+            # generate top5 predictions
+            values = ["alef", "ayin", "bet", "dalet", "gimel", "he", "het", "kaf", "kaf-final", "lamed", "mem",
+                      "mem-medial", "nun-final", "nun-medial", "pe", "pe-final", "qof", "resh", "samekh", "shin", "taw",
+                      "tet", "tsadi-final", "tsadi-medial", "waw", "yod", "zayin"]
             keys = range(len(values))
             alphabets = dict(zip(keys, values))
             sorting = (-predictions).argsort()
-            top5 = sorting[:,:5]
-            
-            #top5_predictions is a list of lists containing the top5 predictions per character
+            top5 = sorting[:, :5]
+
+            # top5_predictions is a list of lists containing the top5 predictions per character
             # todo append char_id to each list of top5 predictions
             top5_predictions = []
             for i in range(top5.shape[0]):
                 new_char = []
                 for j in range(top5.shape[1]):
-                    label_class = top5[i,j]
+                    label_class = top5[i, j]
                     alphabet = alphabets[label_class]
                     new_char.append(alphabet)
                 top5_predictions.append(new_char)
-                
+
             top5_predictions = np.asarray(top5_predictions)
             predictions_with_id = np.concatenate((char_id, top5_predictions), axis=1)
-            
+
             outfile_name = filename + ".csv"
             with open(outfile_name, "w") as outfile:
-              for j in range(predictions_with_id.shape[0]):
-                if j == 0:
-                  outfile.write(str(predictions_with_id[j,2]) + " ")
-                else:
-                  if predictions_with_id[j-1,0] == predictions_with_id[j,0]:
-                    outfile.write(str(predictions_with_id[j,2]) + " ")
-                  else:
-                    outfile.write("\n")
-    
+                for j in range(predictions_with_id.shape[0]):
+                    if j == 0:
+                        outfile.write(str(predictions_with_id[j, 2]) + " ")
+                    else:
+                        if predictions_with_id[j - 1, 0] == predictions_with_id[j, 0]:
+                            outfile.write(str(predictions_with_id[j, 2]) + " ")
+                        else:
+                            outfile.write("\n")
+
     # TODO output txt files with the predictions
     # one file with top5 predictions
 
 
+def take_input_argument():
+    # print the given arguments
+    print("The arguments are: ", str(sys.argv))
+    if len(sys.argv) == 1:
+        imagefolder_path = 'images'
+        print("use default folder: " + imagefolder_path)
+    else:
+        imagefolder_path = sys.argv[1]
+        print("given folder: " + imagefolder_path)
+    return imagefolder_path
 
-
+# take input argument (file path) from command
+imagefolder_path = take_input_argument()
 # convert scroll img to character imgs
-convert_scroll_to_imgs()
+convert_scroll_to_imgs(imagefolder_path)
 
 # convert imgs to csv
 convert_img_to_csv()
