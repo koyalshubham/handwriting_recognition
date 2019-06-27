@@ -322,7 +322,7 @@ def convert_img_to_csv():
             img_filename = row['filename']
 
             try:
-                IMG_SIZE = 100
+                IMG_SIZE = 50
                 img_array = cv2.imread(img_filename, cv2.IMREAD_GRAYSCALE)  # convert to array
                 new_array = cv2.resize(img_array, (IMG_SIZE, IMG_SIZE))  # resize to normalize data size
 
@@ -341,7 +341,7 @@ def convert_img_to_csv():
             char_array.extend([line, col])
 
             for features in test_data:
-                new_img = np.reshape(features, 10000)
+                new_img = np.reshape(features, 2500)
                 char_array.extend(new_img)
 
             scroll_array.append(char_array)
@@ -362,7 +362,7 @@ def run_model():
             model = load_model('hwr50px.h5')
 
             # preprocess input into train and char_id nparrays
-            with open(filename, 'r') as infile:
+            with open('segmented_characters/'+filename, 'r') as infile:
                 reader = csv.reader(infile)
                 lines = list(reader)
             input_data = []
@@ -371,8 +371,17 @@ def run_model():
                 input_data.append(new_row)
             input_data = np.asarray(input_data)
 
+            print(input_data.shape)
             char_id = input_data[:, :2]
             train = input_data[:, 2:]
+            train = train.reshape(train.shape[0], 50, 50, 1)
+            train = train.astype('float32')
+            train/=255
+
+
+            number_of_classes = 27
+
+
 
             predictions = model.predict(train)
 
@@ -430,7 +439,7 @@ def take_input_argument():
 # take input argument (file path) from command
 imagefolder_path = take_input_argument()
 # convert scroll img to character imgs
-convert_scroll_to_imgs(imagefolder_path)
+# convert_scroll_to_imgs(imagefolder_path)
 
 # convert imgs to csv
 convert_img_to_csv()
