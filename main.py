@@ -399,19 +399,20 @@ def run_model():
             top5_predictions = np.asarray(top5_predictions)
             predictions_with_id = np.concatenate((char_id, top5_predictions), axis=1)
 
-            outfile_name = filename + ".csv"
-            with open(outfile_name, "w") as outfile:
-                for j in range(predictions_with_id.shape[0]):
-                    if j == 0:
-                        outfile.write(str(predictions_with_id[j, 2]) + " ")
+            outfile_name = filename + ".txt"
+            outfile = open(outfile_name, "w+")
+            for prediction in range(1,6): # top 5 predictions
+                outfile.write("Prediction " + str(prediction) + ":")
+                for line in range(predictions_with_id.shape[0]):
+                    if line == 1:
+                        outfile.write(str(predictions_with_id[line,prediction+1]) + " ")
                     else:
-                        if predictions_with_id[j - 1, 0] == predictions_with_id[j, 0]:
-                            outfile.write(str(predictions_with_id[j, 2]) + " ")
+                        if predictions_with_id[line-1,0] == predictions_with_id[line,0]:
+                            outfile.write(str(predictions_with_id[line,prediction+1]) + " ")
                         else:
-                            outfile.write("\n")
-
-    # TODO output txt files with the predictions
-    # one file with top5 predictions
+                            outfile.write("\r\n")
+                            outfile.write(str(predictions_with_id[line,prediction+1]) + " ")
+                outfile.write("\r\n")
 
 
 # used to set the path to the test images
