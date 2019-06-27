@@ -399,11 +399,17 @@ def run_model():
             predictions_with_id = np.concatenate((char_id, top5_predictions), axis=1)
             
             outfile_name = filename + ".csv"
-            
-            numpy.savetxt(outfile_name, predictions_with_id, delimiter=",")
+            with open(outfile_name, "w") as outfile:
+              for j in range(predictions_with_id.shape[0]):
+                if j == 0:
+                  outfile.write(str(predictions_with_id[j,2]) + " ")
+                else:
+                  if predictions_with_id[j-1,0] == predictions_with_id[j,0]:
+                    outfile.write(str(predictions_with_id[j,2]) + " ")
+                  else:
+                    outfile.write("\n")
     
     # TODO output txt files with the predictions
-    # one file with top1 predictions
     # one file with top5 predictions
 
 
