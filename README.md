@@ -5,6 +5,8 @@ This can be done with the following command:
 chmod +x requirements.sh
 sudo ./requirements.sh
 
+Please use tensorflow 1.X versions only.
+
 # input
 As input this program takes the path containing the fused dead-sea scrolls given by the user as an argument using command. Example: python my_classifier.py mypath/testset/.
 If no path is given, the path takes the default value 'images' and searches for a folder with that name in the same root directory.
