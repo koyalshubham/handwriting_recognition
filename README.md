@@ -2,6 +2,7 @@
 
 Please run the requirements.sh file with sudo command to install all the required packages.
 This can be done with the following command:
+chmod +x requirements.sh
 sudo ./requirements.sh
 
 # input
