@@ -12,3 +12,5 @@ sudo apt-get install python-numpy python-scipy python-matplotlib ipython ipython
 sudo pip3 install scikit-image
 sudo pip3 install tqdm
 sudo pip3 install keras
+sudo pip install tensorflow==1.14
+sudo pip install pandas
