@@ -359,7 +359,7 @@ def run_model():
     seg_chars = os.listdir('segmented_characters')
     for filename in seg_chars:
         if filename[-3:] == 'csv':
-            model = load_model('hwr50px.h5')
+            model = load_model('hwr50px_new.h5')
 
             # preprocess input into train and char_id nparrays
             with open('segmented_characters/'+filename, 'r') as infile:
