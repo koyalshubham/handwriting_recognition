@@ -21,8 +21,10 @@ take_input_argument() sets the directory of the test images given by the user us
 convert_scroll_to_imgs(imagefolder_path) converts the test images in directory imagefolder_path to images of segmented characters. Each with the line number and column number as label. These images are stored in the root directory in folder 'segmented_characters' in a subfolder with the name of the test image. If theses folders do not exist then they will be created.
 
 # function convert_img_to_csv():
+convert_img_to_csv() converts the imgs of the segmented characters into a csv in the MNIST-like format, with a resolution of 50x50 pixels.
 
 # function run_model()
+run_model() loads the trained VGGNet and makes predictions on the csv generated from the segmented characters.
 
 # output image processing
 As output this program has two folders.
@@ -30,4 +32,4 @@ segmented_characters contains the imgs with a character.
 marked_areas contains the scrolls with the marked words and their line number. 
 
 # output machine learning
-The segemented characters for each folder of the scrolls were extracted into a training_data data structrue. Once this Data Structure was loaded. The training_data was later converted to a CSV which was the input for the recogniser created.
+The segemented characters for each folder of the scrolls were extracted into a input_data data structure, which contains both the character id and the vector representation of the character. After preprocessing the training data into the proper format, it was fed to the model. As output, we get a csv with the top-5 predictions for every line and every character.
