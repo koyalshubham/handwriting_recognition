@@ -32,4 +32,4 @@ segmented_characters contains the imgs with a character.
 marked_areas contains the scrolls with the marked words and their line number. 
 
 # output machine learning
-The segemented characters for each folder of the scrolls were extracted into a input_data data structure, which contains both the character id and the vector representation of the character. After preprocessing the training data into the proper format, it was fed to the model. As output, we get a csv with the top-5 predictions for every line and every character.
+The segemented characters for each folder of the scrolls were extracted into a input_data data structure, which contains both the character id and the vector representation of the character. After preprocessing the training data into the proper format, it was fed to the model. As output for every scroll img, we get a txt with the top-5 predictions for every line and every character. The txt files are created in the parent directory.
