@@ -397,6 +397,10 @@ def run_model():
                 
             top5_predictions = np.asarray(top5_predictions)
             predictions_with_id = np.concatenate((char_id, top5_predictions), axis=1)
+            
+            outfile_name = filename + ".csv"
+            
+            numpy.savetxt(outfile_name, predictions_with_id, delimiter=",")
     
     # TODO output txt files with the predictions
     # one file with top1 predictions
