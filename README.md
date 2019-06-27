@@ -1,11 +1,11 @@
 # packages to download
 
 Please run the requirements.sh file with sudo command to install all the required packages.
-This can be done with the following command:
-chmod +x requirements.sh
-sudo ./requirements.sh
-
-Please use tensorflow 1.X versions only.
+This can be done with the following command:<br/>
+chmod +x requirements.sh<br/>
+sudo ./requirements.sh<br/>
+<br/>
+You may have to manually install opencv-python, pandas, keras, tensorflow(1.14), tpdm, scikit-image, especially if you run it on a virtualenv. Please use tensorflow 1.X versions only.
 
 # input
 As input this program takes the path containing the fused dead-sea scrolls given by the user as an argument using command. Example: python my_classifier.py mypath/testset/.
