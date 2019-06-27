@@ -7,6 +7,10 @@ sudo ./requirements.sh<br/>
 <br/>
 You may have to manually install opencv-python, pandas, keras, tensorflow(1.14), tpdm, scikit-image, especially if you run it on a virtualenv. Please use tensorflow 1.X versions only.
 
+# download model
+
+please download the model from: https://drive.google.com/open?id=1Ezm6wXPHalIHgTIEJomV9kl6B61goyIA
+
 # input
 As input this program takes the path containing the fused dead-sea scrolls given by the user as an argument using command. Example: python my_classifier.py mypath/testset/.
 If no path is given, the path takes the default value 'images' and searches for a folder with that name in the same root directory.
