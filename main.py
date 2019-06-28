@@ -356,11 +356,13 @@ def convert_img_to_csv():
 
 # used to predict the label of the segmented characters and generate a csv file with the prediction
 def run_model():
+    model = load_model('hwr50px_new.h5')
     seg_chars = os.listdir('segmented_characters')
     for filename in seg_chars:
         if filename[-3:] == 'csv':
-            model = load_model('hwr50px_new.h5')
-
+            
+            print('Prediction for a new scroll img started')
+            
             # preprocess input into train and char_id nparrays
             with open('segmented_characters/'+filename, 'r') as infile:
                 reader = csv.reader(infile)
@@ -371,7 +373,6 @@ def run_model():
                 input_data.append(new_row)
             input_data = np.asarray(input_data)
 
-            print(input_data.shape)
             char_id = input_data[:, :2]
             train = input_data[:, 2:]
             train = train.reshape(train.shape[0], 50, 50, 1)
@@ -446,3 +447,4 @@ convert_img_to_csv()
 
 # run model
 run_model()
+print("Completed generating all prediction files")
