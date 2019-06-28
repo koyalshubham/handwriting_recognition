@@ -9,7 +9,7 @@ You may have to manually install opencv-python, pandas, keras, tensorflow(1.14),
 
 # download model
 
-please download the model from: https://drive.google.com/open?id=1Ezm6wXPHalIHgTIEJomV9kl6B61goyIA
+please download the model from: https://drive.google.com/open?id=1Ezm6wXPHalIHgTIEJomV9kl6B61goyIA and put it in the same directory as main.py
 
 # input
 As input this program takes the path containing the fused dead-sea scrolls given by the user as an argument using command. Example: python my_classifier.py mypath/testset/.
