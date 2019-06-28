@@ -7,6 +7,16 @@ sudo ./requirements.sh<br/>
 <br/>
 You may have to manually install opencv-python, pandas, keras, tensorflow(1.14), tpdm, scikit-image, especially if you run it on a virtualenv. Please use tensorflow 1.X versions only.
 
+You might have to create a virtual environment to pip install packages from requirements.txt file
+
+Steps to create Venv on differnt platforms
+==========================================
+On macOS and Linux:
+
+python3 -m venv env
+On Windows:
+
+py -m venv env
 # download model
 
 please download the model from: https://drive.google.com/open?id=1Ezm6wXPHalIHgTIEJomV9kl6B61goyIA and put it in the same directory as main.py
