@@ -5,7 +5,7 @@ This can be done with the following command:<br/>
 chmod +x requirements.sh<br/>
 sudo ./requirements.sh<br/>
 <br/>
-You may have to manually install opencv-python, pandas, keras, tensorflow(1.14), tpdm, scikit-image, especially if you run it on a virtualenv. Please use tensorflow 1.X versions only.
+You may have to manually install opencv-python, pandas, keras, tensorflow(1.14), tpdm, scikit-image, especially if you run it on a virtualenv. Please use tensorflow 1.X versions only. We used 1.4.0 version for tensorflow
 
 You might have to create a virtual environment to pip install packages from requirements.txt file
 
